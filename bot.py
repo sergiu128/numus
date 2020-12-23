@@ -11,14 +11,18 @@ import requests
 from urllib.parse import urlencode
 from telegram.ext import Updater, CommandHandler
 
-with open('./.bitstamp', 'r') as fin:
-    a = json.load(fin)
-    client_id = a['client_id']
-    main_key = a['main_key']
-    main_secret = a['main_secret']
+def load_config():
+    with open('./config/config.json', 'r') as config:
+        return json.loads(config.read())
 
-api_key = main_key
-API_SECRET = bytes(main_secret, 'utf-8')
+config = load_config()
+
+client_id = config['bitstamp']['client_id']
+key = config['bitstamp']['key']
+secret = config['bitstamp']['secret']
+
+api_key = key
+API_SECRET = bytes(secret, 'utf-8')
 
 timestamp = str(int(round(time.time() * 1000)))
 nonce = str(uuid.uuid4())
@@ -63,8 +67,6 @@ if not r.headers.get('X-Server-Auth-Signature') == signature_check:
 
 print(r.content)
 
-exit()
-
 def get_market(symbol):
     resp = requests.get('https://www.bitstamp.net/api/v2/ticker/{}/'.format(symbol))
     ticker = resp.json()
@@ -100,9 +102,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 
-with open('./.bot_token', 'r') as fin:
-    token = fin.read().strip()
-
+token = config['telegram']['bot_token']
 
 updater = Updater(token=token)
 dispatcher = updater.dispatcher

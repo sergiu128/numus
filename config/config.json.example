@@ -1,0 +1,11 @@
+{
+    "bitstamp": {
+        "client_id": "",
+        "key": "",
+        "secret": ""
+    },
+    "telegram": {
+        "bot_token": ""
+    }
+}
+
