@@ -1,8 +1,14 @@
 {
     "bitstamp": {
         "client_id": "",
-        "key": "",
-        "secret": ""
+            "sub_account1": {
+                "key": "",
+                "secret": ""
+            },
+            "sub_account2": {
+                "key": "",
+                "secret": ""
+            }
     },
     "telegram": {
         "bot_token": ""
