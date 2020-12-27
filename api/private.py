@@ -127,23 +127,3 @@ def get_open_orders(account):
 
     return '\n'.join(text)
 
-
-def get_market(symbol):
-    resp = requests.get('https://www.bitstamp.net/api/v2/ticker/{}/'.format(symbol))
-    ticker = resp.json()
-
-    bid = float(ticker['bid'])
-    ask = float(ticker['ask'])
-    price = (bid + ask) / 2
-
-    open_price = float(ticker['open'])
-
-    low_price = float(ticker['low'])
-    high_price = float(ticker['high'])
-
-    text = 'price: {}\nlow: {}\nhigh: {}\nopen: {}' \
-        .format(round(price, 2), round(open_price, 2),
-                round(low_price, 2), round(high_price, 2))
-
-    return text
-
