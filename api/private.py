@@ -127,8 +127,6 @@ def get_open_orders(account):
 
     return '\n'.join(text)
 
-# {"price": "18500.00", "amount": "0.06039621", "type": "0", "id": "1310115506532354", "datetime": "2020-12-23 01:36:33"},
-
 
 def get_market(symbol):
     resp = requests.get('https://www.bitstamp.net/api/v2/ticker/{}/'.format(symbol))

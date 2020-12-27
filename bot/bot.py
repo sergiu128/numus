@@ -1,6 +1,8 @@
 import logging
 
-import api
+from api import public
+from api import private
+
 import util
 
 from telegram.ext import Updater, CommandHandler
