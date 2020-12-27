@@ -25,6 +25,7 @@ def get_eth_market(update, context):
 
 def get_open_orders(update, context):
     text = api.get_open_orders('tati')
+    if text == '': text = 'No open orders.'
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
