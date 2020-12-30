@@ -1,6 +1,7 @@
 import re
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+
 def generate_currency_pair(pairs):
     keyboard = []
     for pair in pairs:

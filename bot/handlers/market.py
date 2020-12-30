@@ -1,7 +1,8 @@
-import keyboard
+from bot import keyboard
+from bot.handlers import help as help_handler
 
 from api import interface
-from handlers import help as help_handler
+
 from telegram.ext import (
     ConversationHandler,
     CommandHandler,

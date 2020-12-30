@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
+import os
 import logging
 import json
 
-from handlers import (
+from bot.handlers import (
     market as market_handler,
     help as help_handler,
     trades as trades_handler,
@@ -11,8 +12,10 @@ from handlers import (
 
 from telegram.ext import Updater, CommandHandler
 
+print(__file__)
+print(os.path.abspath('config/config.json'))
 
-with open('../config/config.json', 'r') as fin:
+with open('config/config.json', 'r') as fin:
     config = json.loads(fin.read())
 
 token = config['telegram']['bot_token']
