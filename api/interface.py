@@ -1,4 +1,3 @@
-import json
 from api import public
 
 # returns:
@@ -7,12 +6,15 @@ from api import public
 #   - vwap
 #   - last-trade
 #   - volume
-def market(exchange, currency_pair):
+def market(exchange, currency_pair, time_range):
     order_book = public.order_book(currency_pair, group=1)
     top_bid, _ = order_book['bids'][0]
     top_ask, _ = order_book['asks'][0]
 
-    ticker = public.ticker(currency_pair)
+    if time_range == 1:
+        ticker = public.hourly_ticker(currency_pair)
+    else:
+        ticker = public.ticker(currency_pair)
 
     vwap = ticker['vwap']
     last_trade = ticker['last']
