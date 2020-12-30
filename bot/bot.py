@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import os
 import logging
 import json
@@ -12,29 +10,20 @@ from bot.handlers import (
 
 from telegram.ext import Updater, CommandHandler
 
-print(__file__)
-print(os.path.abspath('config/config.json'))
-
-with open('config/config.json', 'r') as fin:
-    config = json.loads(fin.read())
-
-token = config['telegram']['bot_token']
-
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
+class Bot:
+    def __init__(self, token):
+        self.token = token
 
-def run():
-    updater = Updater(token=token)
-    dispatcher = updater.dispatcher
+    def run(self):
+        updater = Updater(token=self.token)
+        dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(market_handler.generate())
-    dispatcher.add_handler(help_handler.generate())
-    dispatcher.add_handler(trades_handler.generate())
+        dispatcher.add_handler(market_handler.generate())
+        dispatcher.add_handler(help_handler.generate())
+        dispatcher.add_handler(trades_handler.generate())
 
-    updater.start_polling()
-
-
-if __name__ == '__main__':
-    run()
+        updater.start_polling()
 
