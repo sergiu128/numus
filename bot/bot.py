@@ -19,20 +19,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 
-def start(update, context):
-    keyboard = [
-        [
-            InlineKeyboardButton("Option 1", callback_data='1'),
-            InlineKeyboardButton("Option 2", callback_data='2'),
-        ],
-        [InlineKeyboardButton("Option 3", callback_data='3')],
-    ]
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
-    update.message.reply_text('Please choose:', reply_markup=reply_markup)
-
-
 def market(update, context):
     keyboard = [
         [
@@ -67,6 +53,12 @@ def market_callback(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
+def trades(update, context):
+    response = api.interface.trades('bitstamp', 'btceur')
+    text = response
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+
 def help_command(update, context) -> None:
     update.message.reply_text("Not yet implemented.")
 
@@ -75,11 +67,12 @@ def run():
     updater = Updater(token=token)
     dispatcher = updater.dispatcher
 
+    dispatcher.add_handler(CommandHandler('help', help_command))
+
     dispatcher.add_handler(CommandHandler('market', market))
     dispatcher.add_handler(CallbackQueryHandler(market_callback))
 
-    dispatcher.add_handler(CommandHandler('help', help_command))
-
+    dispatcher.add_handler(CommandHandler('trades', trades))
 
     updater.start_polling()
 

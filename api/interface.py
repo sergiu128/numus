@@ -1,5 +1,6 @@
 from api import public
 
+
 # returns:
 #   - top-bid
 #   - top-ask
@@ -29,4 +30,17 @@ def market(exchange, currency_pair, time_range):
     }
 
     return ret
+
+
+def trades(exchange, currency_pair):
+    trades = public.transactions(currency_pair, 'hour')[:5]
+
+    ret = []
+    for trade in trades:
+        action = 'buy' if trade['type'] == '0' else 'sell'
+        amount = trade['amount']
+        price = round(float(trade['price']), 1)
+        ret.append('{} {} @ {}'.format(action, amount, price))
+
+    return '\n'.join(ret)
 
