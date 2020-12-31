@@ -4,8 +4,8 @@ import json
 from bot import bot
 
 
-with open('config/config.json', 'r') as config:
-    config = json.loads(config.read())
+with open('config/config.json', 'r') as fin:
+    config = json.loads(fin.read())
 
 
 if __name__ == '__main__':
