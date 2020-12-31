@@ -8,7 +8,7 @@ import requests
 from urllib.parse import urlencode
 
 
-def user_transactions(account, limit=10):
+def user_transactions(account, limit):
     route = '/api/v2/user_transactions/'
     payload = {
         'limit': str(limit)
@@ -18,10 +18,10 @@ def user_transactions(account, limit=10):
     return response
 
 
-def open_orders(account, currency_pair='all'):
+def open_orders(account, currency_pair, payload):
     route = '/api/v2/open_orders/{}/'.format(currency_pair)
 
-    response = _query(account, route)
+    response = _query(account, route, payload)
     return response
 
 
@@ -40,7 +40,7 @@ with open('config/config.json', 'r') as fin:
     config = json.loads(fin.read())
 
 
-def _query(account, route, payload={}):
+def _query(account, route, payload):
     print('here payload {}'.format(payload))
     key = config['bitstamp'][account]['key']
     secret = bytes(config['bitstamp'][account]['secret'], 'utf-8')
@@ -95,3 +95,4 @@ def _query(account, route, payload={}):
     content = json.loads(response.content)
 
     return content
+
