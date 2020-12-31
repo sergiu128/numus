@@ -36,6 +36,12 @@ def order_status(account, offset, order_id):
     return response
 
 
+def balance(account):
+    route = '/api/v2/balance/'
+    response = _query(account, route, {})
+    return response
+
+
 with open('config/config.json', 'r') as fin:
     config = json.loads(fin.read())
 

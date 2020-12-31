@@ -50,3 +50,9 @@ def open(exchange, currency_pair='all'):
     open_orders = private.open_orders('main', currency_pair)
     return open_orders
 
+
+# returns: account balance and fees for all currency pairs
+def balance(exchange):
+    account_balance = private.balance('main')
+    return account_balance
+
