@@ -18,18 +18,18 @@ def user_transactions(account, limit):
     return response
 
 
-def open_orders(account, currency_pair, payload):
+def open_orders(account, currency_pair):
     route = '/api/v2/open_orders/{}/'.format(currency_pair)
 
-    response = _query(account, route, payload)
+    response = _query(account, route, {})
     return response
 
 
-def order_status(account, order_id):
+def order_status(account, offset, order_id):
     route = '/api/v2/order_status/'
     payload = {
-        'offset': 1,
-        'id': order_id
+        'offset': str(offset),
+        'id': str(order_id)
     }
 
     response = _query(account, route, payload)
