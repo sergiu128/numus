@@ -16,7 +16,7 @@ SELECT, REPLY = range(2)
 def select_currency_pair(update, context):
     markup = keyboard.generate_currency_pair(['btceur', 'etheur'])
 
-    update.message.reply_text('time range:', reply_markup=markup)
+    update.message.reply_text('currency pair:', reply_markup=markup)
 
     return SELECT
 
