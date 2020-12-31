@@ -1,7 +1,7 @@
 from api import public, private
 
 
-# returns:
+# returns: (dict) market for currency pair
 #   - top-bid
 #   - top-ask
 #   - vwap
@@ -21,7 +21,7 @@ def market(exchange, currency_pair, time_range):
     last_trade = ticker['last']
     volume = ticker['volume']
 
-    ret = {
+    response = {
         'top-bid': str(round(float(top_bid), 1)),
         'top-ask': str(round(float(top_ask), 1)),
         'vwap': str(round(float(vwap), 1)),
@@ -29,30 +29,67 @@ def market(exchange, currency_pair, time_range):
         'volume': str(round(float(volume), 1)),
     }
 
-    return ret
+    return response
 
-# returns: last 5 trades done on <currency_pair>
+# returns: (dict[]) last 5 trades done on <currency_pair>
+#   - side: buy | sell
+#   - amount
+#   - price
 def trades(exchange, currency_pair):
     trades = public.transactions(currency_pair, 'hour')[:5]
 
-    ret = []
+    responses = []
     for trade in trades:
-        action = 'buy' if trade['type'] == '0' else 'sell'
+        side = 'buy' if trade['type'] == '0' else 'sell'
         amount = trade['amount']
         price = round(float(trade['price']), 1)
-        ret.append('{} {} @ {}'.format(action, amount, price))
 
-    return '\n'.join(ret)
+        response = {
+            'side': side,
+            'amount': amount,
+            'price': price
+        }
+
+        responses.append(response)
+
+    return responses
 
 
-# returns: all open orders for all currency pairs
+# returns: (dict[]) all open orders for all currency pairs
+#   - side
+#   - amount
+#   - currency_pair
+#   - price
+#   - datetime
 def open(exchange, currency_pair='all'):
     open_orders = private.open_orders('main', currency_pair)
-    return open_orders
+
+    responses = []
+    for order in open_orders:
+        side = 'buy' if order['type'] == '0' else 'sell'
+        amount = float(order['amount'])
+        currency_pair = order['currency_pair'].lower()
+        price = order['price']
+        datetime = order['datetime']
+
+        response = {
+            'side': side,
+            'amount': amount,
+            'currency_pair': currency_pair,
+            'price': price,
+            'datetime': datetime,
+        }
+
+        responses.append(response)
+
+    return responses
 
 
-# returns: account balance and fees for all currency pairs
+# returns: (dict) account balance and fees for all currency pairs
+#   - <currency_pair>_balance
 def balance(exchange):
     account_balance = private.balance('main')
-    return account_balance
+    filtered = { key:value for (key, value) in account_balance.items() if 'balance' in key }
+
+    return filtered
 
