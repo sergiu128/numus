@@ -41,7 +41,6 @@ with open('config/config.json', 'r') as fin:
 
 
 def _query(account, route, payload):
-    print('here payload {}'.format(payload))
     key = config['bitstamp'][account]['key']
     secret = bytes(config['bitstamp'][account]['secret'], 'utf-8')
     nonce = str(uuid.uuid4())
@@ -66,7 +65,6 @@ def _query(account, route, payload):
         'X-Auth-Version': 'v2',
     }
 
-    print(content_type)
     if content_type != '':
         headers['Content-Type'] = content_type
 
