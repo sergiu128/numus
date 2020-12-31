@@ -45,7 +45,7 @@ def trades(exchange, currency_pair):
     return '\n'.join(ret)
 
 
-# returns:
+# returns: all open orders for all currency pairs
 def open(exchange, currency_pair='all'):
     open_orders = private.open_orders('main', currency_pair)
     return open_orders
