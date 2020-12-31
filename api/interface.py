@@ -1,4 +1,4 @@
-from api import public
+from api import public, private
 
 
 # returns:
@@ -31,7 +31,7 @@ def market(exchange, currency_pair, time_range):
 
     return ret
 
-
+# returns: last 5 trades done on <currency_pair>
 def trades(exchange, currency_pair):
     trades = public.transactions(currency_pair, 'hour')[:5]
 
@@ -43,4 +43,10 @@ def trades(exchange, currency_pair):
         ret.append('{} {} @ {}'.format(action, amount, price))
 
     return '\n'.join(ret)
+
+
+# returns:
+def open(exchange, currency_pair='all'):
+    open_orders = private.open_orders('main', currency_pair)
+    return open_orders
 

@@ -6,6 +6,7 @@ from bot.handlers import (
     market as market_handler,
     help as help_handler,
     trades as trades_handler,
+    open as open_handler,
 )
 
 from telegram.ext import Updater, CommandHandler
@@ -24,6 +25,7 @@ class Bot:
         dispatcher.add_handler(market_handler.generate())
         dispatcher.add_handler(help_handler.generate())
         dispatcher.add_handler(trades_handler.generate())
+        dispatcher.add_handler(open_handler.generate())
 
         updater.start_polling()
 
