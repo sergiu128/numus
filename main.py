@@ -3,8 +3,6 @@
 import json
 from bot import bot
 
-import api.private
-
 
 with open('config/config.json', 'r') as fin:
     config = json.loads(fin.read())
