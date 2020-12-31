@@ -19,16 +19,17 @@ class Bot:
     def __init__(self, token):
         self.token = token
 
+    def register_handlers(self):
+        self.updater = Updater(token=self.token)
+        self.dispatcher = self.updater.dispatcher
+
+        self.dispatcher.add_handler(market_handler.generate())
+        self.dispatcher.add_handler(help_handler.generate())
+        self.dispatcher.add_handler(trades_handler.generate())
+        self.dispatcher.add_handler(open_handler.generate())
+        self.dispatcher.add_handler(balance_handler.generate())
+
     def run(self):
-        updater = Updater(token=self.token)
-        dispatcher = updater.dispatcher
-
-        dispatcher.add_handler(market_handler.generate())
-        dispatcher.add_handler(help_handler.generate())
-        dispatcher.add_handler(trades_handler.generate())
-        dispatcher.add_handler(open_handler.generate())
-        dispatcher.add_handler(balance_handler.generate())
-
-        updater.start_polling()
+        self.updater.start_polling()
 
 
