@@ -47,6 +47,7 @@ def reply(update, context):
         raise Exception('Invalid time range.')
 
     currency_pair = context.user_data['market|currency_pair']
+    del context.user_data['market|currency_pair']
 
     response = interface.market(context.user_data['exchange'], currency_pair, time_range)
 
