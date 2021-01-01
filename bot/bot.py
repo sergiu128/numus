@@ -7,6 +7,7 @@ from bot.handlers import (
     open as open_handler,
     balance as balance_handler,
     set as set_handler,
+    timer as timer_handler,
 )
 
 from telegram.ext import Updater, PicklePersistence
@@ -38,7 +39,10 @@ class Bot:
         self.dispatcher.add_handler(open_handler.generate())
         self.dispatcher.add_handler(balance_handler.generate())
         self.dispatcher.add_handler(set_handler.generate())
+        self.dispatcher.add_handler(timer_handler.generate())
 
     def run(self):
         self.updater.start_polling()
+        self.updater.idle()
+
 
