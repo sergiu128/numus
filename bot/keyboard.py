@@ -9,6 +9,7 @@ def generate_currency_pair(pairs):
 
     return InlineKeyboardMarkup(keyboard)
 
+
 def generate_time(times):
     pattern = re.compile('[0-9]+')
 
@@ -19,6 +20,14 @@ def generate_time(times):
             raise Exception('Invalid time.')
 
         keyboard.append([InlineKeyboardButton(t, callback_data=match.group())])
+
+    return InlineKeyboardMarkup(keyboard)
+
+
+def generate(keys):
+    keyboard = []
+    for key in keys:
+        keyboard.append([InlineKeyboardButton(key, callback_data=key)])
 
     return InlineKeyboardMarkup(keyboard)
 

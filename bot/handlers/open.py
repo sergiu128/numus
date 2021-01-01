@@ -3,7 +3,7 @@ from api import interface
 
 
 def open_command(update, context):
-    open_orders = interface.open('bitstamp', 'all')
+    open_orders = interface.open(context.user_data['exchange'], context.user_data['exchange_account'], 'all')
 
     messages = []
     for order in open_orders:

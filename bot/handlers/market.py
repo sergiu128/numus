@@ -9,8 +9,6 @@ from telegram.ext import (
     CallbackQueryHandler
 )
 
-from telegram.parsemode import ParseMode
-
 
 SELECT, REPLY = range(2)
 
@@ -27,7 +25,7 @@ def select_time(update, context):
     query = update.callback_query
     query.answer()
 
-    context.user_data['currency_pair'] = query.data
+    context.user_data['market|currency_pair'] = query.data
 
     markup = keyboard.generate_time(['24h', '1h'])
 
@@ -48,9 +46,9 @@ def reply(update, context):
     else:
         raise Exception('Invalid time range.')
 
-    currency_pair = context.user_data['currency_pair']
+    currency_pair = context.user_data['market|currency_pair']
 
-    response = interface.market('bitstamp', currency_pair, time_range)
+    response = interface.market(context.user_data['exchange'], currency_pair, time_range)
 
     bid_ask_spread = '{:<12} @ {:>12}'.format(
         ''.join(['bid ', response['top-bid']]),
@@ -66,7 +64,7 @@ def reply(update, context):
 
     text = '\n'.join([bid_ask_spread, '', last_trade, day_open, '', vwap, low, high, volume])
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+    query.edit_message_text(text=text)
 
     return ConversationHandler.END
 

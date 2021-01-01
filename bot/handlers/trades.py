@@ -3,7 +3,7 @@ from telegram.ext import CommandHandler
 
 
 def trades(update, context):
-    trades = interface.trades('bitstamp', 'btceur')
+    trades = interface.trades(context.user_data['exchange'], 'btceur')
 
     reply = []
     for trade in trades:

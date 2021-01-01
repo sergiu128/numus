@@ -3,7 +3,7 @@ from telegram.ext.commandhandler import CommandHandler
 
 
 def balance_command(update, context):
-    account_balance = interface.balance('bitstamp')
+    account_balance = interface.balance(context.user_data['exchange'], context.user_data['exchange_account'])
     reply = []
     for pair, amount in account_balance.items():
         amount = float(amount)

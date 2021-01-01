@@ -1,6 +1,4 @@
-import os
 import logging
-import json
 
 from bot.handlers import (
     market as market_handler,
@@ -8,12 +6,15 @@ from bot.handlers import (
     trades as trades_handler,
     open as open_handler,
     balance as balance_handler,
+    set as set_handler,
 )
 
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater
+
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
+
 
 class Bot:
     def __init__(self, token):
@@ -28,6 +29,7 @@ class Bot:
         self.dispatcher.add_handler(trades_handler.generate())
         self.dispatcher.add_handler(open_handler.generate())
         self.dispatcher.add_handler(balance_handler.generate())
+        self.dispatcher.add_handler(set_handler.generate())
 
     def run(self):
         self.updater.start_polling()
