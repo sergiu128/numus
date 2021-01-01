@@ -18,3 +18,4 @@ def open_command(update, context):
 
 def generate():
     return CommandHandler('open', open_command)
+

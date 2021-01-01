@@ -20,13 +20,20 @@ def market(exchange, currency_pair, time_range):
     vwap = ticker['vwap']
     last_trade = ticker['last']
     volume = ticker['volume']
+    day_open = ticker['open']
+    high = ticker['high']
+    low = ticker['low']
+
 
     response = {
         'top-bid': str(round(float(top_bid), 1)),
         'top-ask': str(round(float(top_ask), 1)),
         'vwap': str(round(float(vwap), 1)),
         'last-trade': str(round(float(last_trade), 1)),
+        'high': str(round(float(high), 1)),
+        'low': str(round(float(low), 1)),
         'volume': str(round(float(volume), 1)),
+        'day-open': str(round(float(day_open), 1)),
     }
 
     return response

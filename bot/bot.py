@@ -32,4 +32,3 @@ class Bot:
     def run(self):
         self.updater.start_polling()
 
-

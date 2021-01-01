@@ -9,6 +9,8 @@ from telegram.ext import (
     CallbackQueryHandler
 )
 
+from telegram.parsemode import ParseMode
+
 
 SELECT, REPLY = range(2)
 
@@ -49,12 +51,20 @@ def reply(update, context):
     currency_pair = context.user_data['currency_pair']
 
     response = interface.market('bitstamp', currency_pair, time_range)
-    text = '{:<12} @ {:>12}\nvwap: {:>17} \nlast-trade: {:>9} \nvolume: {:>13}'.format(
+
+    bid_ask_spread = '{:<12} @ {:>12}'.format(
         ''.join(['bid ', response['top-bid']]),
-        ''.join([response['top-ask'], ' ask']),
-        response['vwap'],
-        response['last-trade'],
-        response['volume'])
+        ''.join([response['top-ask'], ' ask'])
+    )
+    last_trade = 'last trade: {:>9}'.format(response['last-trade'])
+    day_open = 'day-open: {:>9}'.format(response['day-open'])
+
+    vwap = '{}h vwap: {:>12}'.format(time_range, response['vwap'])
+    low = '{}h low: {:>15}'.format(time_range, response['low'])
+    high = '{}h high: {:>14}'.format(time_range, response['high'])
+    volume = '{}h volume: {:>8}'.format(time_range, response['volume'])
+
+    text = '\n'.join([bid_ask_spread, '', last_trade, day_open, '', vwap, low, high, volume])
 
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
