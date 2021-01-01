@@ -1,5 +1,6 @@
 tags
-config/config.json
+config/
+!config/config.json.example
 __pycache__/
 todo.md
 *.egg*
