@@ -2,6 +2,10 @@ from api import interface
 from telegram.ext.commandhandler import CommandHandler
 
 
+def description():
+    return 'get account balance for all currency pairs'
+
+
 def balance_command(update, context):
     account_balance = interface.balance(context.user_data['exchange'], context.user_data['exchange_account'])
     reply = []

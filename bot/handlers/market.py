@@ -13,6 +13,10 @@ from telegram.ext import (
 SELECT, REPLY = range(2)
 
 
+def description():
+    return 'get market for a currency pair'
+
+
 def select_currency_pair(update, context):
     markup = keyboard.generate_currency_pair(['btceur', 'etheur'])
 

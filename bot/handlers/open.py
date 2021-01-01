@@ -2,6 +2,10 @@ from telegram.ext.commandhandler import CommandHandler
 from api import interface
 
 
+def description():
+    return 'get currently open orders'
+
+
 def open_command(update, context):
     open_orders = interface.open(context.user_data['exchange'], context.user_data['exchange_account'], 'all')
 

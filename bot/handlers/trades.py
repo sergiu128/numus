@@ -13,6 +13,10 @@ from telegram.ext import (
 REPLY = 0
 
 
+def description():
+    return 'get a list of the last 5 trades'
+
+
 def select_currency_pair(update, context):
     markup = keyboard.generate_currency_pair(['btceur', 'etheur'])
     update.message.reply_text(text='currency pair:', reply_markup=markup)

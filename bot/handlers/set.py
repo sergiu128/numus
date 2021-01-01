@@ -8,6 +8,10 @@ from api import interface
 SELECT_ACCOUNT, REPLY = range(2)
 
 
+def description():
+    return 'sets the exchange and account to pull data from'
+
+
 def select_exchange(update, context):
     markup = keyboard.generate(['bitstamp'])
     update.message.reply_text(text='select exchange:', reply_markup=markup)
