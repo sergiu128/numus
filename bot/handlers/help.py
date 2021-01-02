@@ -6,6 +6,7 @@ from bot.handlers import (
     open as open_handler,
     balance as balance_handler,
     set as set_handler,
+    timer as timer_handler,
 )
 
 
@@ -20,6 +21,7 @@ def output():
         '/open: {}'.format(open_handler.describe()),
         '/balance: {}'.format(balance_handler.describe()),
         '/set: {}'.format(set_handler.describe()),
+        '/timer: {}'.format(timer_handler.describe()),
         '/help: display this help prompt',
     ])
 

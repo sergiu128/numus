@@ -25,7 +25,13 @@ active_timer_jobs = []
 
 
 def describe():
-    return 'use /timer <command> <time>s/m/h) to trigger a command after <time>s/m/h'
+    setup = '/timer <command> <time>s/m/h'
+    setup_info = 'trigger a command after <time> or every <time>'
+
+    cancel = '/timer'
+    cancel_info = 'cancel one of the active timers'
+
+    return '\n    {}\n    {}\n    {}\n    {}'.format(setup, setup_info, cancel, cancel_info)
 
 
 def _parse_command(command):
