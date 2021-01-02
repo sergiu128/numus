@@ -1,14 +1,18 @@
 {
-    "bitstamp": {
-        "client_id": "",
-            "sub_account1": {
-                "key": "",
-                "secret": ""
-            },
-            "sub_account2": {
-                "key": "",
-                "secret": ""
+    "exchanges": {
+        "bitstamp": {
+            "client_id": "",
+            "accounts": {
+                "sub_account1": {
+                    "key": "",
+                    "secret": ""
+                },
+                "sub_account2": {
+                    "key": "",
+                    "secret": ""
+                }
             }
+        }
     },
     "telegram": {
         "bot_token": ""
