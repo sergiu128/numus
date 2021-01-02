@@ -1,3 +1,4 @@
+from bot import config
 from telegram.ext.commandhandler import CommandHandler
 from api import interface
 
@@ -21,13 +22,16 @@ def output(exchange, exchange_account, pair):
 
 
 def _open(update, context):
-    # TODO add option to return open orders for all accounts
     exchange = context.user_data['exchange']
-    exchange_account = context.user_data['exchange_account']
+
+    accounts = config.accounts(exchange)
     pair = 'all'
 
-    text = output(exchange, exchange_account, pair)
-    update.message.reply_text(text=text)
+    text = []
+    for account in accounts:
+        text.append('{}:\n{}'.format(account, output(exchange, account, pair)))
+
+    update.message.reply_text(text='\n'.join(text))
 
 
 def generate():
