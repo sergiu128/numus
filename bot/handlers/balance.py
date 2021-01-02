@@ -6,7 +6,7 @@ def describe():
     return 'get account balance for all currency pairs'
 
 
-def run(exchange, exchange_account):
+def output(exchange, exchange_account):
     account_balance = interface.balance(exchange, exchange_account)
 
     reply = []
@@ -20,11 +20,13 @@ def run(exchange, exchange_account):
 
 
 def _balance(update, context):
+    # TODO add option to return balance for all accounts
     exchange = context.user_data['exchange']
     exchange_account = context.user_data['exchange_account']
-    reply = run(exchange, exchange_account)
 
-    update.message.reply_text(reply)
+    text = output(exchange, exchange_account)
+
+    update.message.reply_text(text=text)
 
 
 def  generate():

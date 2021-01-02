@@ -6,7 +6,7 @@ def describe():
     return 'get currently open orders'
 
 
-def run(exchange, exchange_account, pair):
+def output(exchange, exchange_account, pair):
     open_orders = interface.open(exchange, exchange_account, pair)
 
     reply = []
@@ -21,12 +21,13 @@ def run(exchange, exchange_account, pair):
 
 
 def _open(update, context):
+    # TODO add option to return open orders for all accounts
     exchange = context.user_data['exchange']
     exchange_account = context.user_data['exchange_account']
     pair = 'all'
 
-    reply = run(exchange, exchange_account, pair)
-    update.message.reply_text(reply)
+    text = output(exchange, exchange_account, pair)
+    update.message.reply_text(text=text)
 
 
 def generate():

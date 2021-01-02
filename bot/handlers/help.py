@@ -13,7 +13,7 @@ def describe():
     raise NotImplementedError()
 
 
-def run():
+def output():
     reply = '\n'.join([
         '/market: {}'.format(market_handler.describe()),
         '/trades: {}'.format(trades_handler.describe()),
@@ -26,11 +26,11 @@ def run():
     return reply
 
 
-def callback(update, context):
-    reply = run()
-    update.message.reply_text(reply)
+def _callback(update, context):
+    text = output()
+    update.message.reply_text(text=text)
 
 
 def generate():
-    return CommandHandler('help', callback)
+    return CommandHandler('help', _callback)
 

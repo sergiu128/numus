@@ -19,7 +19,7 @@ def describe():
     return 'get a list of the last 5 trades'
 
 
-def run(exchange, currency_pair):
+def output(exchange, currency_pair):
     trades = interface.trades(exchange, currency_pair)
 
     reply = []
@@ -28,7 +28,7 @@ def run(exchange, currency_pair):
 
     return '\n'.join(reply)
 
-def _state_get_currency_pair(update, context):
+def _state_0_get_currency_pair(update, context):
     if 'trades' not in context.user_data:
         context.user_data['trades'] = {}
 
@@ -38,7 +38,7 @@ def _state_get_currency_pair(update, context):
     return STATE_REPLY
 
 
-def _state_reply(update, context):
+def _state_1_reply(update, context):
     query = update.callback_query
     query.answer()
     context.user_data['trades']['currency_pair'] = query.data
@@ -46,17 +46,17 @@ def _state_reply(update, context):
     exchange = context.user_data['exchange']
     currency_pair = context.user_data['trades']['currency_pair']
 
-    reply = run(exchange, currency_pair)
-    query.edit_message_text(reply)
+    text = output(exchange, currency_pair)
+    query.edit_message_text(text=text)
 
     return ConversationHandler.END
 
 
 def generate():
     handler = ConversationHandler(
-        entry_points=[CommandHandler('trades', _state_get_currency_pair)],
+        entry_points=[CommandHandler('trades', _state_0_get_currency_pair)],
         states = {
-            STATE_REPLY: [CallbackQueryHandler(_state_reply)]
+            STATE_REPLY: [CallbackQueryHandler(_state_1_reply)]
         },
         fallbacks=[help_handler.generate()]
     )

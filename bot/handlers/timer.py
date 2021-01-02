@@ -1,6 +1,5 @@
 import datetime
 import pytz
-import uuid
 
 from telegram.ext import (
     CommandHandler,
@@ -35,21 +34,23 @@ def _parse_command(command):
 
 
 def _parse_count(count):
-    if count[-1] not in ['h', 'm', 's']:
+    if count[-1].lower() not in ['h', 'm', 's']:
         raise Exception('Invalid time unit {}. Use one of: s, m, h.'.format(count[-1]))
 
     return int(count[:-1]), count[-1]
 
 
-def _state_get_type(update, context):
+def _state_0_get_type(update, context):
     if len(context.args) == 0:
         names = [job.name for job in active_timer_jobs]
         if names == []:
             update.message.reply_text(text='no active timers.')
+
             return ConversationHandler.END
         else:
             markup = keyboard.generate_currency_pair(names)
             update.message.reply_text(text='active timers, press to remove', reply_markup=markup)
+
             return STATE_INFO
     elif len(context.args) != 2:
         update.message.reply_text(describe())
@@ -73,7 +74,7 @@ def _state_get_type(update, context):
     return STATE_REPLY
 
 
-def _state_info(update, context):
+def _state_1_rm_timer(update, context):
     query = update.callback_query
     query.answer()
 
@@ -88,7 +89,55 @@ def _state_info(update, context):
 
     return ConversationHandler.END
 
-def _state_set_timer(update, context):
+
+def _callback(context):
+    # will run the <command> asynchronously once the timer has elapsed
+    job = context.job
+
+    chat_id = job.context['chat_id']
+    command = job.context['command']
+    user_data = job.context['user_data']
+    timer_type = user_data['timer']['type']
+
+    if command == 'market':
+        pooled_function = market_handler.output
+        pooled_args = {
+            'exchange': user_data['exchange'],
+            'currency_pair': user_data['market']['currency_pair'],
+            'time_range': user_data['market']['time_range']
+        }
+    elif command == 'trades':
+        pooled_function = trades_handler.output
+        pooled_args = {
+            'exchange': user_data['exchange'],
+            'currency_pair': user_data['trades']['currency_pair'],
+        }
+    elif command == 'open':
+        pooled_function = open_handler.output
+        pooled_args = {
+            'exchange': user_data['exchange'],
+            'exchange_account': user_data['exchange_account'],
+            'pair': 'all',
+        }
+    elif command == 'balance':
+        pooled_function = balance_handler.output
+        pooled_args = {
+            'exchange': user_data['exchange'],
+            'exchange_account': user_data['exchange_account'],
+        }
+    else:
+        raise NotImplementedError()
+
+    promise = context.dispatcher.run_async(pooled_function, **pooled_args)
+    promise.run()
+
+    context.bot.send_message(chat_id=chat_id, text=promise.result())
+
+    if timer_type == 'once':
+        active_timer_jobs.remove(job)
+
+
+def _state_1_set_timer(update, context):
     query = update.callback_query
     query.answer()
 
@@ -114,19 +163,21 @@ def _state_set_timer(update, context):
     }
 
     timer_name = '{}:{}:{}{}'.format(timer_type, command, due, unit)
-
     timezone = pytz.timezone('Europe/Bucharest')
+
     if timer_type == 'once':
         when = timezone.localize(datetime.datetime.now() + delta)
+
         timer_job = context.job_queue.run_once(callback=_callback,
                                                when=when,
                                                context=callback_context,
                                                name=timer_name)
     elif timer_type == 'repeat':
-        trigger_time = timezone.localize(datetime.datetime.now())
+        when = timezone.localize(datetime.datetime.now())
+
         timer_job = context.job_queue.run_repeating(callback=_callback,
                                                     interval=delta,
-                                                    first=trigger_time,
+                                                    first=when,
                                                     context=callback_context,
                                                     name=timer_name)
     else:
@@ -134,69 +185,24 @@ def _state_set_timer(update, context):
 
     active_timer_jobs.append(timer_job)
 
-    query.edit_message_text(
-        'timer set: trigger /{} {} {}{}.'.format(
-            command,
-            'every' if timer_type == 'repeat' else 'after',
-            due,
-            unit)
+    reply = 'timer set: trigger /{} {} {}{}.'.format(
+        command,
+        'every' if timer_type == 'repeat' else 'after',
+        due,
+        unit
     )
+
+    query.edit_message_text(reply)
 
     return ConversationHandler.END
 
 
-def _callback(context):
-    # will run the <command> asynchronously once the timer has elapsed
-    job = context.job
-
-    chat_id = job.context['chat_id']
-    command = job.context['command']
-    user_data = job.context['user_data']
-    timer_type = user_data['timer']['type']
-
-    if command == 'market':
-        pooled_function = market_handler.run
-        pooled_args = {
-            'exchange': user_data['exchange'],
-            'currency_pair': user_data['market']['currency_pair'],
-            'time_range': user_data['market']['time_range']
-        }
-    elif command == 'trades':
-        pooled_function = trades_handler.run
-        pooled_args = {
-            'exchange': user_data['exchange'],
-            'currency_pair': user_data['trades']['currency_pair'],
-        }
-    elif command == 'open':
-        pooled_function = open_handler.run
-        pooled_args = {
-            'exchange': user_data['exchange'],
-            'exchange_account': user_data['exchange_account'],
-            'pair': 'all',
-        }
-    elif command == 'balance':
-        pooled_function = balance_handler.run
-        pooled_args = {
-            'exchange': user_data['exchange'],
-            'exchange_account': user_data['exchange_account'],
-        }
-    else:
-        raise NotImplementedError()
-
-    promise = context.dispatcher.run_async(pooled_function, **pooled_args)
-    promise.run()
-    context.bot.send_message(chat_id=chat_id, text=promise.result())
-
-    if timer_type == 'once':
-        active_timer_jobs.remove(job)
-
-
 def generate():
     handler = ConversationHandler(
-        entry_points=[CommandHandler('timer', _state_get_type)],
+        entry_points=[CommandHandler('timer', _state_0_get_type)],
         states={
-            STATE_REPLY: [CallbackQueryHandler(_state_set_timer)],
-            STATE_INFO: [CallbackQueryHandler(_state_info)]
+            STATE_REPLY: [CallbackQueryHandler(_state_1_set_timer)],
+            STATE_INFO: [CallbackQueryHandler(_state_1_rm_timer)]
         },
         fallbacks=[help_handler.generate()]
     )

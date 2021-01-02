@@ -17,7 +17,7 @@ def describe():
     return 'get market for a currency pair'
 
 
-def run(exchange, currency_pair, time_range):
+def output(exchange, currency_pair, time_range):
     response = interface.market(exchange, currency_pair, time_range)
 
     bid_ask_spread = '{:<12} @ {:>12}'.format(
@@ -36,7 +36,7 @@ def run(exchange, currency_pair, time_range):
     return text
 
 
-def state_get_currency_pair(update, context):
+def _state_0_get_currency_pair(update, context):
     if 'market' not in context.user_data:
         context.user_data['market'] = {}
 
@@ -46,7 +46,7 @@ def state_get_currency_pair(update, context):
     return STATE_GET_TIME
 
 
-def state_get_time(update, context):
+def _state_1_get_time(update, context):
     query = update.callback_query
     query.answer()
 
@@ -57,7 +57,7 @@ def state_get_time(update, context):
     return STATE_REPLY
 
 
-def state_reply(update, context):
+def _state_2_reply(update, context):
     query = update.callback_query
     query.answer()
 
@@ -70,8 +70,8 @@ def state_reply(update, context):
     currency_pair = context.user_data['market']['currency_pair']
     time_range = context.user_data['market']['time_range']
 
-    reply = run(exchange, currency_pair, time_range)
-    query.edit_message_text(text=reply)
+    text = output(exchange, currency_pair, time_range)
+    query.edit_message_text(text=text)
 
     return ConversationHandler.END
 
@@ -79,13 +79,11 @@ def state_reply(update, context):
 def generate():
     handler = ConversationHandler(
         entry_points=[
-            CommandHandler('market', state_get_currency_pair)
+            CommandHandler('market', _state_0_get_currency_pair)
         ],
         states={
-            STATE_GET_TIME: [
-                CallbackQueryHandler(state_get_time)
-            ],
-            STATE_REPLY: [CallbackQueryHandler(state_reply)]
+            STATE_GET_TIME: [CallbackQueryHandler(_state_1_get_time)],
+            STATE_REPLY: [CallbackQueryHandler(_state_2_reply)]
         },
         fallbacks=[help_handler.generate()],
     )

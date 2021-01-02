@@ -12,14 +12,23 @@ def describe():
     return 'sets the exchange and account to pull data from'
 
 
-def _state_get_exchange(update, context):
+def output(exchange, exchange_account):
+    text = '\n'.join([
+        'exchange: {}'.format(exchange),
+        'account: {}'.format(exchange_account),
+    ])
+
+    return text
+
+
+def _state_0_get_exchange(update, context):
     markup = keyboard.generate(['bitstamp'])
     update.message.reply_text(text='select exchange:', reply_markup=markup)
 
     return STATE_GET_ACCOUNT
 
 
-def _state_get_account(update, context):
+def _state_1_get_account(update, context):
     query = update.callback_query
     query.answer()
 
@@ -35,16 +44,16 @@ def _state_get_account(update, context):
     return STATE_REPLY
 
 
-def reply(update, context):
+def _state_2_reply(update, context):
     query = update.callback_query
     query.answer()
 
     context.user_data['exchange_account'] = query.data
 
-    text = '\n'.join([
-        'exchange: {}'.format(context.user_data['exchange']),
-        'account: {}'.format(context.user_data['exchange_account']),
-    ])
+    exchange = context.user_data['exchange']
+    exchange_account = context.user_data['exchange_account']
+
+    text = output(exchange, exchange_account)
 
     query.edit_message_text(text=text)
 
@@ -53,13 +62,13 @@ def reply(update, context):
 
 def generate():
     handler = ConversationHandler(
-        entry_points=[CommandHandler('set', _state_get_exchange)],
+        entry_points=[CommandHandler('set', _state_0_get_exchange)],
         states={
             STATE_GET_ACCOUNT: [
-                CallbackQueryHandler(_state_get_account)
+                CallbackQueryHandler(_state_1_get_account)
             ],
             STATE_REPLY: [
-                CallbackQueryHandler(reply)
+                CallbackQueryHandler(_state_2_reply)
             ],
         },
         fallbacks=[help_handler.generate()]
