@@ -29,6 +29,8 @@ def run(exchange, currency_pair):
     return '\n'.join(reply)
 
 def _state_get_currency_pair(update, context):
+    if 'trades' not in context.user_data:
+        context.user_data['trades'] = {}
 
     markup = keyboard.generate_currency_pair(['btceur', 'etheur'])
     update.message.reply_text(text='currency pair:', reply_markup=markup)
@@ -39,9 +41,10 @@ def _state_get_currency_pair(update, context):
 def _state_reply(update, context):
     query = update.callback_query
     query.answer()
+    context.user_data['trades']['currency_pair'] = query.data
 
     exchange = context.user_data['exchange']
-    currency_pair = query.data
+    currency_pair = context.user_data['trades']['currency_pair']
 
     reply = run(exchange, currency_pair)
     query.edit_message_text(reply)
