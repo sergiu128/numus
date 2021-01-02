@@ -4,7 +4,7 @@ from telegram.ext.commandhandler import CommandHandler
 
 
 def describe():
-    return 'get account balance for all currency pairs'
+    return 'get balance for all accounts and currency pairs'
 
 
 def output(exchange, exchange_account):
@@ -27,7 +27,7 @@ def _balance(update, context):
 
     text = []
     for account in accounts:
-        text.append('{}:\n  {}\n'.format(account, output(exchange, account)))
+        text.append('{}-{}:\n  {}\n'.format(exchange, account, output(exchange, account)))
 
     update.message.reply_text(text='\n'.join(text))
 

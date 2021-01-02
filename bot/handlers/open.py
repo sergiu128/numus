@@ -4,7 +4,7 @@ from api import interface
 
 
 def describe():
-    return 'get currently open orders'
+    return 'get currently open orders on all accounts'
 
 
 def output(exchange, exchange_account, pair):
@@ -29,7 +29,7 @@ def _open(update, context):
 
     text = []
     for account in accounts:
-        text.append('{}:\n{}'.format(account, output(exchange, account, pair)))
+        text.append('{}-{}:\n{}'.format(exchange, account, output(exchange, account, pair)))
 
     update.message.reply_text(text='\n'.join(text))
 
