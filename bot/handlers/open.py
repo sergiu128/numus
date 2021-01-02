@@ -25,11 +25,13 @@ def _open(update, context):
     exchange = context.user_data['exchange']
 
     accounts = config.accounts(exchange)
-    pair = 'all'
+    if accounts == []:
+        update.message.reply_text(text='/open unavailable - no accounts found.')
+        return
 
     text = []
     for account in accounts:
-        text.append('{}-{}:\n{}'.format(exchange, account, output(exchange, account, pair)))
+        text.append('{}-{}:\n{}'.format(exchange, account, output(exchange, account, 'all')))
 
     update.message.reply_text(text='\n'.join(text))
 

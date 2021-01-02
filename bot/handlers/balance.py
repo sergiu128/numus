@@ -24,6 +24,10 @@ def _balance(update, context):
     exchange = context.user_data['exchange']
 
     accounts = config.accounts(exchange)
+    if accounts == []:
+        update.message.reply_text(text='/balance unavailable - no accounts found.')
+        return
+
 
     text = []
     for account in accounts:
