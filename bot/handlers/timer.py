@@ -1,10 +1,13 @@
 import datetime
 import pytz
+import uuid
+
 from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
     ConversationHandler
 )
+
 
 from bot.handlers import (
     market as market_handler,
@@ -17,7 +20,9 @@ from bot.handlers import (
 from bot import keyboard
 
 
-STATE_REPLY = 0
+STATE_REPLY, STATE_INFO = range(2)
+
+active_timers = []
 
 
 def describe():
@@ -37,10 +42,19 @@ def _parse_count(count):
 
 
 def _state_get_type(update, context):
-    print(context.user_data)
-    if len(context.args) != 2:
+    if len(context.args) == 0:
+        names = [name.split('.')[1] for name in active_timers]
+        if names == []:
+            update.message.reply_text(text='no active timers.')
+        else:
+            markup = keyboard.generate_currency_pair(names)
+            update.message.reply_text(text='active timers', reply_markup=markup)
+
+        return ConversationHandler.END
+    elif len(context.args) != 2:
         update.message.reply_text(describe())
-        return
+
+        return ConversationHandler.END
 
     command = _parse_command(context.args[0])
     due, unit = _parse_count(context.args[1])
@@ -57,6 +71,15 @@ def _state_get_type(update, context):
     update.message.reply_text(text='timer type:', reply_markup=markup)
 
     return STATE_REPLY
+
+
+def _state_info(update, context):
+    query = update.callback_query
+    query.answer()
+    query.edit_message_text('alsdkjflkasjdfj')
+    for job in active_timers:
+        print(job.name, job.enabled)
+    return ConversationHandler.END
 
 
 def _state_set_timer(update, context):
@@ -82,30 +105,33 @@ def _state_set_timer(update, context):
         'user_data': context.user_data,
     }
 
+    timer_name = '{}.{}:{}:{}{}'.format(uuid.uuid4().hex, timer_type, command, due, unit)
+
     timezone = pytz.timezone('Europe/Bucharest')
     if timer_type == 'once':
         when = timezone.localize(datetime.datetime.now() + delta)
         context.job_queue.run_once(callback=_callback,
-                                   when=when,
-                                   context=callback_context,
-                                   name=str(chat_id))
+                                               when=when,
+                                               context=callback_context,
+                                               name=timer_name)
     elif timer_type == 'repeat':
         trigger_time = timezone.localize(datetime.datetime.now())
         context.job_queue.run_repeating(callback=_callback,
-                                        interval=delta,
-                                        first=trigger_time,
-                                        context=callback_context,
-                                        name=str(chat_id))
+                                                    interval=delta,
+                                                    first=trigger_time,
+                                                    context=callback_context,
+                                                    name=timer_name)
     else:
         raise Exception('Invalid timer type.')
+
+    active_timers.append(timer_name)
 
     query.edit_message_text(
         'timer set: trigger /{} {} {}{}.'.format(
             command,
             'every' if timer_type == 'repeat' else 'after',
             due,
-            unit
-        )
+            unit)
     )
 
     return ConversationHandler.END
@@ -152,13 +178,17 @@ def _callback(context):
     promise.run()
     context.bot.send_message(chat_id=chat_id, text=promise.result())
 
+    print(active_timers)
+    active_timers.remove(job.name)
+    print(active_timers)
 
 
 def generate():
     handler = ConversationHandler(
-        entry_points=[CommandHandler('timer', _state_get_type, pass_chat_data=True)],
+        entry_points=[CommandHandler('timer', _state_get_type)],
         states={
-            STATE_REPLY: [CallbackQueryHandler(_state_set_timer, pass_chat_data=True)]
+            STATE_REPLY: [CallbackQueryHandler(_state_set_timer)],
+            STATE_INFO: [CallbackQueryHandler(_state_info)]
         },
         fallbacks=[help_handler.generate()]
     )
