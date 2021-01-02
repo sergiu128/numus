@@ -1,5 +1,7 @@
 import logging
 
+from bot import config
+
 from bot.handlers import (
     market as market_handler,
     help as help_handler,
