@@ -10,6 +10,7 @@ A Telegram bot that makes it easier to track your crypto portfolio.
 - `/timer`:
     - `/timer <command> <time>s/m/h`: trigger a command after `<time>` or every `<time>`
     - `/timer`: cancel one of the active timers
+    - the timer always executes the last configuration of the command
 - `/help`: display this help prompt
 
 ### Setup
