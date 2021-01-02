@@ -35,8 +35,12 @@ def _state_1_get_account(update, context):
     exchange = query.data
     context.user_data['exchange'] = exchange
 
-    markup = keyboard.generate(config.accounts(exchange))
+    accounts = config.accounts(exchange)
+    if accounts == []:
+        query.edit_message_text(text='selected {}; no accounts found.'.format(exchange))
+        return ConversationHandler.END
 
+    markup = keyboard.generate(accounts)
     query.edit_message_text(
         text='select account',
         reply_markup=markup
