@@ -32,7 +32,12 @@ def describe():
 
 
 def _parse_command(command):
-    # TODO check for command validity
+    if command[0] == '/':
+        command = command[1:]
+
+    if command not in ['market', 'trades', 'open', 'balance']:
+        raise Exception('Invalid command.')
+
     return command
 
 
@@ -60,8 +65,17 @@ def _state_0_get_type(update, context):
 
         return ConversationHandler.END
 
-    command = _parse_command(context.args[0])
-    due, unit = _parse_count(context.args[1])
+    try:
+        command = _parse_command(context.args[0])
+    except:
+        update.message.reply_text(text='invalid command /{}'.format(context.args[0]))
+        return ConversationHandler.END
+
+    try:
+        due, unit = _parse_count(context.args[1])
+    except:
+        update.message.reply_text(text='invalid time {}'.format(context.args[1]))
+        return ConversationHandler.END
 
     if 'timer' not in context.user_data:
         context.user_data['timer'] = {}
