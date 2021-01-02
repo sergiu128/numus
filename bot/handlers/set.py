@@ -5,21 +5,21 @@ from telegram.ext import CommandHandler, ConversationHandler, CallbackQueryHandl
 from api import interface
 
 
-SELECT_ACCOUNT, REPLY = range(2)
+STATE_GET_ACCOUNT, STATE_REPLY = range(2)
 
 
-def description():
+def describe():
     return 'sets the exchange and account to pull data from'
 
 
-def select_exchange(update, context):
+def _state_get_exchange(update, context):
     markup = keyboard.generate(['bitstamp'])
     update.message.reply_text(text='select exchange:', reply_markup=markup)
 
-    return SELECT_ACCOUNT
+    return STATE_GET_ACCOUNT
 
 
-def select_account(update, context):
+def _state_get_account(update, context):
     query = update.callback_query
     query.answer()
 
@@ -32,7 +32,7 @@ def select_account(update, context):
         reply_markup=markup
     )
 
-    return REPLY
+    return STATE_REPLY
 
 
 def reply(update, context):
@@ -53,10 +53,14 @@ def reply(update, context):
 
 def generate():
     handler = ConversationHandler(
-        entry_points=[CommandHandler('set', select_exchange)],
+        entry_points=[CommandHandler('set', _state_get_exchange)],
         states={
-            SELECT_ACCOUNT: [CallbackQueryHandler(select_account)],
-            REPLY: [CallbackQueryHandler(reply)],
+            STATE_GET_ACCOUNT: [
+                CallbackQueryHandler(_state_get_account)
+            ],
+            STATE_REPLY: [
+                CallbackQueryHandler(reply)
+            ],
         },
         fallbacks=[help_handler.generate()]
     )

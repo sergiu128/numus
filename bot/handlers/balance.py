@@ -2,24 +2,31 @@ from api import interface
 from telegram.ext.commandhandler import CommandHandler
 
 
-def description():
+def describe():
     return 'get account balance for all currency pairs'
 
 
-def balance_command(update, context):
-    account_balance = interface.balance(context.user_data['exchange'], context.user_data['exchange_account'])
+def run(exchange, exchange_account):
+    account_balance = interface.balance(exchange, exchange_account)
+
     reply = []
     for pair, amount in account_balance.items():
         amount = float(amount)
         if amount > 0.0 and 'balance' in pair:
             currency = pair[:pair.index('_balance')]
-            reply.append(
-                '{}: {}'.format(currency.upper(), amount)
-            )
+            reply.append('{}: {}'.format(currency.upper(), amount))
 
-    update.message.reply_text('\n'.join(reply))
+    return '\n'.join(reply)
+
+
+def _balance(update, context):
+    exchange = context.user_data['exchange']
+    exchange_account = context.user_data['exchange_account']
+    reply = run(exchange, exchange_account)
+
+    update.message.reply_text(reply)
 
 
 def  generate():
-    return CommandHandler('balance', balance_command)
+    return CommandHandler('balance', _balance)
 

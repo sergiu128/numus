@@ -9,19 +9,28 @@ from bot.handlers import (
 )
 
 
-def help_command(update, context):
-    text = '\n'.join([
-        '/market: {}'.format(market_handler.description()),
-        '/trades: {}'.format(trades_handler.description()),
-        '/open: {}'.format(open_handler.description()),
-        '/balance: {}'.format(balance_handler.description()),
-        '/set: {}'.format(set_handler.description()),
+def describe():
+    raise NotImplementedError()
+
+
+def run():
+    reply = '\n'.join([
+        '/market: {}'.format(market_handler.describe()),
+        '/trades: {}'.format(trades_handler.describe()),
+        '/open: {}'.format(open_handler.describe()),
+        '/balance: {}'.format(balance_handler.describe()),
+        '/set: {}'.format(set_handler.describe()),
         '/help: display this help prompt',
     ])
 
-    update.message.reply_text(text=text)
+    return reply
+
+
+def callback(update, context):
+    reply = run()
+    update.message.reply_text(reply)
 
 
 def generate():
-    return CommandHandler('help', help_command)
+    return CommandHandler('help', callback)
 
