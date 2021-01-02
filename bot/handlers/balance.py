@@ -1,3 +1,4 @@
+from bot import config
 from api import interface
 from telegram.ext.commandhandler import CommandHandler
 
@@ -20,13 +21,15 @@ def output(exchange, exchange_account):
 
 
 def _balance(update, context):
-    # TODO add option to return balance for all accounts
     exchange = context.user_data['exchange']
-    exchange_account = context.user_data['exchange_account']
 
-    text = output(exchange, exchange_account)
+    accounts = config.accounts(exchange)
 
-    update.message.reply_text(text=text)
+    text = []
+    for account in accounts:
+        text.append('{}:\n  {}\n'.format(account, output(exchange, account)))
+
+    update.message.reply_text(text='\n'.join(text))
 
 
 def  generate():
