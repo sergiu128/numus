@@ -14,6 +14,7 @@ A Telegram bot that makes it easier to track your crypto portfolio.
 
 ### Setup
 The bot is currently not publicly available, however it only takes 5 minutes to set it up for yourself:
+0. run `pip3 install -r requirements.txt`.
 1. Contact the [botfather](https://t.me/botfather) and setup up a Telegram bot.
 2. Put the bot token in `./config/config.json` (see `./config.json.example`).
 3. Run the bot: `python run.py` in your terminal prompt
