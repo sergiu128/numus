@@ -22,7 +22,7 @@ from bot import keyboard
 
 STATE_REPLY, STATE_INFO = range(2)
 
-active_timers = []
+active_timer_jobs = []
 
 
 def describe():
@@ -43,14 +43,14 @@ def _parse_count(count):
 
 def _state_get_type(update, context):
     if len(context.args) == 0:
-        names = [name.split('.')[1] for name in active_timers]
+        names = [job.name for job in active_timer_jobs]
         if names == []:
             update.message.reply_text(text='no active timers.')
+            return ConversationHandler.END
         else:
             markup = keyboard.generate_currency_pair(names)
-            update.message.reply_text(text='active timers', reply_markup=markup)
-
-        return ConversationHandler.END
+            update.message.reply_text(text='active timers, press to remove', reply_markup=markup)
+            return STATE_INFO
     elif len(context.args) != 2:
         update.message.reply_text(describe())
 
@@ -76,21 +76,29 @@ def _state_get_type(update, context):
 def _state_info(update, context):
     query = update.callback_query
     query.answer()
-    query.edit_message_text('alsdkjflkasjdfj')
-    for job in active_timers:
-        print(job.name, job.enabled)
-    return ConversationHandler.END
 
+    timer_name = query.data
+
+    for job in active_timer_jobs:
+        if job.name == timer_name:
+            active_timer_jobs.remove(job)
+            break
+
+    query.edit_message_text('timer removed')
+
+    return ConversationHandler.END
 
 def _state_set_timer(update, context):
     query = update.callback_query
     query.answer()
 
+    context.user_data['timer']['type'] = query.data
+
     chat_id = context.user_data['timer']['chat_id']
     command = context.user_data['timer']['command']
     due = context.user_data['timer']['due']
     unit = context.user_data['timer']['unit']
-    timer_type = query.data
+    timer_type = context.user_data['timer']['type']
 
     if unit == 's':
         delta = datetime.timedelta(seconds=due)
@@ -105,18 +113,18 @@ def _state_set_timer(update, context):
         'user_data': context.user_data,
     }
 
-    timer_name = '{}.{}:{}:{}{}'.format(uuid.uuid4().hex, timer_type, command, due, unit)
+    timer_name = '{}:{}:{}{}'.format(timer_type, command, due, unit)
 
     timezone = pytz.timezone('Europe/Bucharest')
     if timer_type == 'once':
         when = timezone.localize(datetime.datetime.now() + delta)
-        context.job_queue.run_once(callback=_callback,
+        timer_job = context.job_queue.run_once(callback=_callback,
                                                when=when,
                                                context=callback_context,
                                                name=timer_name)
     elif timer_type == 'repeat':
         trigger_time = timezone.localize(datetime.datetime.now())
-        context.job_queue.run_repeating(callback=_callback,
+        timer_job = context.job_queue.run_repeating(callback=_callback,
                                                     interval=delta,
                                                     first=trigger_time,
                                                     context=callback_context,
@@ -124,7 +132,7 @@ def _state_set_timer(update, context):
     else:
         raise Exception('Invalid timer type.')
 
-    active_timers.append(timer_name)
+    active_timer_jobs.append(timer_job)
 
     query.edit_message_text(
         'timer set: trigger /{} {} {}{}.'.format(
@@ -144,6 +152,7 @@ def _callback(context):
     chat_id = job.context['chat_id']
     command = job.context['command']
     user_data = job.context['user_data']
+    timer_type = user_data['timer']['type']
 
     if command == 'market':
         pooled_function = market_handler.run
@@ -178,9 +187,8 @@ def _callback(context):
     promise.run()
     context.bot.send_message(chat_id=chat_id, text=promise.result())
 
-    print(active_timers)
-    active_timers.remove(job.name)
-    print(active_timers)
+    if timer_type == 'once':
+        active_timer_jobs.remove(job)
 
 
 def generate():
