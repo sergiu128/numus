@@ -7,10 +7,9 @@ A Telegram bot that makes it easier to track your crypto portfolio.
 - `/open`: get currently open orders (*requires account key+secret*)
 - `/balance`: get account balance for all currency pairs (*requires account key+secret*)
 - `/set`: sets the exchange and account to pull data from
-- `/timer`:
-    - `/timer <command> <time>s/m/h`: trigger a command after `<time>` or every `<time>`
-    - `/timer`: cancel one of the active timers
+- `/timer <command> <time>s/m/h`: trigger a command after `<time>` or every `<time>`
     - the timer always executes the last configuration of the command
+- `/timer`: cancel one of the active timers
 - `/help`: display this help prompt
 
 ### Setup

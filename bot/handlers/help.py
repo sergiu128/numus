@@ -15,13 +15,17 @@ def describe():
 
 
 def output():
-    reply = '\n'.join([
+    # TODO figure out a better way to write this
+    timer_description = timer_handler.describe()
+
+    reply = '\n\n'.join([
         '/market: {}'.format(market_handler.describe()),
         '/trades: {}'.format(trades_handler.describe()),
         '/open: {}'.format(open_handler.describe()),
         '/balance: {}'.format(balance_handler.describe()),
         '/set: {}'.format(set_handler.describe()),
-        '/timer: {}'.format(timer_handler.describe()),
+        timer_description[0],
+        timer_description[1],
         '/help: display this help prompt',
     ])
 
