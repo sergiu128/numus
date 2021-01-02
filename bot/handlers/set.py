@@ -1,4 +1,4 @@
-from bot import keyboard
+from bot import keyboard, config
 from bot.handlers import help as help_handler
 
 from telegram.ext import CommandHandler, ConversationHandler, CallbackQueryHandler
@@ -22,7 +22,7 @@ def output(exchange, exchange_account):
 
 
 def _state_0_get_exchange(update, context):
-    markup = keyboard.generate(['bitstamp'])
+    markup = keyboard.generate(config.exchanges())
     update.message.reply_text(text='select exchange:', reply_markup=markup)
 
     return STATE_GET_ACCOUNT
@@ -32,9 +32,10 @@ def _state_1_get_account(update, context):
     query = update.callback_query
     query.answer()
 
-    context.user_data['exchange'] = query.data
+    exchange = query.data
+    context.user_data['exchange'] = exchange
 
-    markup = keyboard.generate(['main', 'tati'])
+    markup = keyboard.generate(config.accounts(exchange))
 
     query.edit_message_text(
         text='select account',

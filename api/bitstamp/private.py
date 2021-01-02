@@ -7,6 +7,8 @@ import requests
 
 from urllib.parse import urlencode
 
+from bot import config
+
 
 def user_transactions(account, limit):
     route = '/api/v2/user_transactions/'
@@ -42,13 +44,11 @@ def balance(account):
     return response
 
 
-with open('config/config.json', 'r') as fin:
-    config = json.loads(fin.read())
-
-
 def _query(account, route, payload):
-    key = config['bitstamp'][account]['key']
-    secret = bytes(config['bitstamp'][account]['secret'], 'utf-8')
+    info = config.account('bitstamp', account)
+
+    key = info['key']
+    secret = bytes(info['secret'], 'utf-8')
     nonce = str(uuid.uuid4())
     timestamp = str(int(round(time.time() * 1000)))
 
